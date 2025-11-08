@@ -49,6 +49,7 @@ INSTALLED_APPS = [
 
     # my apps
     'users.apps.UsersConfig',
+    'jwt_auth.apps.JwtAuthConfig',
     'permissions.apps.PermissionsConfig',
     'mock_objects.apps.MockObjectsConfig',
 ]
@@ -145,7 +146,7 @@ AUTH_USER_MODEL = 'users.User'
 
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': ['users.auth.auth_backend.JWTAuthentication']
+    'DEFAULT_AUTHENTICATION_CLASSES': ['jwt_auth.backends.JWTAuthentication']
 }
 
 

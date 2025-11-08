@@ -1,7 +1,6 @@
 from rest_framework.authentication import BaseAuthentication
 from rest_framework.exceptions import AuthenticationFailed
-
-from users.auth.token_manager import JWTTokenManager
+from jwt_auth.managers import JWTTokenManager
 
 
 class JWTAuthentication(BaseAuthentication):
