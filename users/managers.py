@@ -3,7 +3,7 @@ from django.core.exceptions import ValidationError
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, email, first_name, last_name, middle_name, password=None, **extra_fields) -> None:
+    def create_user(self, email, first_name, last_name, password=None, **extra_fields) -> None:
         if not email:
             raise ValidationError('Email должен быть указан при регистрации.')
         if not first_name:
