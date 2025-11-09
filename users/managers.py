@@ -5,15 +5,15 @@ from django.core.exceptions import ValidationError
 class UserManager(BaseUserManager):
     def create_user(self, email, first_name, last_name, password=None, **extra_fields) -> None:
         if not email:
-            raise ValidationError('Email должен быть указан при регистрации.')
+            raise ValidationError('Email is required.')
         if not first_name:
-            raise ValidationError('Имя должно быть указано при регистрации.')
+            raise ValidationError('First name is required.')
         if not last_name:
-            raise ValidationError('Фамилия должна быть указана при регистрации.')
+            raise ValidationError('Last name is required.')
         
         email = self.normalize_email(email)
         if self.filter(email=email).exists():
-            raise ValidationError('Пользователь с таким email уже существует.')
+            raise ValidationError('User with this email already exists.')
         
         user = self.model(
             email=email,
@@ -35,9 +35,9 @@ class UserManager(BaseUserManager):
         extra_fields.setdefault('is_active', True)
 
         if extra_fields.get('is_staff') is not True:
-            raise ValueError('Суперпользователь должен иметь is_staff=True.')
+            raise ValueError('Superuer must have is_staff=True.')
         if extra_fields.get('is_superuser') is not True:
-            raise ValueError('Суперпользователь должен иметь is_superuser=True.')
+            raise ValueError('Superuer must have is_superuser=True.')
         
         return self.create_user(email, first_name, last_name, password, **extra_fields)
         

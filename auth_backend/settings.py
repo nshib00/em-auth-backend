@@ -146,11 +146,15 @@ AUTH_USER_MODEL = 'users.User'
 
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': ['jwt_auth.backends.JWTAuthentication']
+    'DEFAULT_AUTHENTICATION_CLASSES': ['jwt_auth.backends.JWTAuthentication'],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 
 SPECTACULAR_SETTINGS = {
+    'TITLE': 'EM auth backend',
+    'DESCRIPTION': 'Система аутентификации и авторизации',
+    'VERSION': '1.0',
+    'SERVE_INCLUDE_SCHEMA': False,
 }
-
 
