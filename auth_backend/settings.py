@@ -156,5 +156,16 @@ SPECTACULAR_SETTINGS = {
     'DESCRIPTION': 'Система аутентификации и авторизации',
     'VERSION': '1.0',
     'SERVE_INCLUDE_SCHEMA': False,
+    'COMPONENT_SPLIT_REQUEST': True,
+    'SCHEMA_PATH_PREFIX': '/api/',
+    'APPEND_COMPONENTS': {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT",
+            }
+        }
+    },
 }
 

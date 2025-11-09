@@ -9,10 +9,11 @@ class JWTAuthentication(BaseAuthentication):
         if not auth_header:
             return None
         try:
-            scheme, token = auth_header.split(' ')
-            if scheme.lower() != 'bearer':
+            header_parts = auth_header.split(' ')
+            if len(header_parts) != 2 or header_parts[0].lower() != 'bearer':
                 return None
+            token = header_parts[1]
             user = JWTTokenManager.authenticate_by_access_token(token)
-            return (user, None)
+            return (user, token)
         except (ValueError, AuthenticationFailed):
             return None
