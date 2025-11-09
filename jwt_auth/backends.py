@@ -5,17 +5,12 @@ from jwt_auth.managers import JWTTokenManager
 
 class JWTAuthentication(BaseAuthentication):
     def authenticate(self, request):
-        auth_header = request.headers.get('Authorization')
-        if not auth_header:
-            return None  
+        access_token = request.COOKIES.get('em_access_token')
+        if not access_token:
+            return None
+        
         try:
-            scheme, token_key = auth_header.split(' ')
-            if scheme.lower() != 'bearer':
-                return None    
-            jwt_manager = JWTTokenManager()
-            user = jwt_manager.authenticate_by_access_token(token_key)
-            if not user:
-                raise AuthenticationFailed('Invalid or expired token')   
-            return (user, None)   
-        except (IndexError, ValueError):
-            raise AuthenticationFailed('Incorrect token format')
+            user = JWTTokenManager.authenticate_by_access_token(access_token)
+            return (user, None)       
+        except AuthenticationFailed as e:
+            raise e
