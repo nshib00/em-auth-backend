@@ -14,7 +14,6 @@ from jwt_auth.token_data import TokenPair, TokenType
 class JWTTokenManager:
     @classmethod
     def _get_active_user(cls, user_id: int) -> AbstractBaseUser:
-        '''Вспомогательная функция для получения активного пользователя'''
         User = get_user_model()
         try:
             user = User.objects.get(id=user_id)
@@ -26,7 +25,6 @@ class JWTTokenManager:
 
     @classmethod
     def _get_token_payload(cls, token: str, verify_exp: bool = True) -> dict:
-        '''Декодирование токена'''
         return jwt.decode(
             jwt=token,
             key=settings.TOKEN_SECRET_KEY,
@@ -36,7 +34,6 @@ class JWTTokenManager:
 
     @classmethod
     def create_token(cls, user_id: int, token_type: TokenType) -> str:
-        '''Создание access/refresh токена'''
         time_now = datetime.now(timezone.utc)
         payload = {
             'sub': str(user_id),
@@ -61,17 +58,15 @@ class JWTTokenManager:
     
     @classmethod
     def save_refresh_token(cls, refresh_token: str, user_id: int) -> None:
-        '''Сохранение refresh токена в БД'''
         payload = cls._get_token_payload(refresh_token)
         RefreshToken.objects.create(
-            token=refresh_token,
+            jti=payload['jti'],
             user_id=user_id,
             expires_at=datetime.fromtimestamp(payload['exp'], tz=timezone.utc),
         )
     
     @classmethod
     def create_token_pair(cls, user_id: int) -> TokenPair:
-        '''Создание пары токенов access-refresh с сохранением refresh токена в БД'''
         access_token = cls.create_token(user_id, TokenType.ACCESS)
         refresh_token = cls.create_token(user_id, TokenType.REFRESH)
         cls.save_refresh_token(refresh_token, user_id)
@@ -83,7 +78,6 @@ class JWTTokenManager:
     
     @classmethod
     def authenticate_by_access_token(cls, token: str) -> AbstractBaseUser:
-        '''Аутентификация по access токену'''
         if not settings.TOKEN_SECRET_KEY or not settings.TOKEN_ALGORITHM:
             raise AuthenticationFailed('JWT config error')
         try:
@@ -109,7 +103,6 @@ class JWTTokenManager:
         
     @classmethod
     def verify_refresh_token(cls, refresh_token: str) -> bool:
-        '''Проверка валидности refresh токена'''
         try:
             payload = cls._get_token_payload(refresh_token)
             
@@ -125,7 +118,6 @@ class JWTTokenManager:
         
     @classmethod
     def refresh_token_pair(cls, refresh_token: str) -> TokenPair:
-        '''Получение по refresh токену новой пары токенов (access + refresh)'''
         if not cls.verify_refresh_token(refresh_token):
             raise AuthenticationFailed('Invalid or expired refresh token')
         
@@ -140,6 +132,5 @@ class JWTTokenManager:
 
     @classmethod
     def delete_user_refresh_tokens(cls, user_id: int) -> None:
-        '''Удаление всех токенов пользователя (для logout и деактивации)'''
         RefreshToken.objects.filter(user_id=user_id).delete()
 
