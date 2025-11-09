@@ -35,3 +35,10 @@ class UserRegisterSerializer(ModelSerializer):
             return user
         except Exception as e:
             raise ValidationError({'Error while creating user': str(e)})
+        
+
+class UserProfileSerializer(ModelSerializer):
+    class Meta:
+        model = get_user_model()
+        fields = ['id', 'email', 'first_name', 'last_name', 'middle_name', 'date_joined']
+        read_only_fields = ['id', 'email', 'date_joined']
