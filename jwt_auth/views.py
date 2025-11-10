@@ -3,6 +3,7 @@ from rest_framework import status
 from auth_backend.views import BaseUserView
 from jwt_auth.managers import JWTTokenManager
 from jwt_auth.serializers import LoginSerializer
+from jwt_auth.utils import get_access_token_from_request
 
 
 class LoginView(BaseUserView):
@@ -39,17 +40,12 @@ class LoginView(BaseUserView):
 
 class LogoutView(BaseUserView):
     def post(self, request):
-        auth_header = request.headers.get('Authorization', '')
-        access_token = None
-        
-        token_parts = auth_header.split(' ')
-        if len(token_parts) != 2 or token_parts[0].lower() != 'bearer':
+        access_token = get_access_token_from_request(request)
+        if access_token is None:
             return Response(
-                {'message': 'Invalid user token'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        access_token = auth_header.split(' ')[1]
-        
+                {'message': 'No token provided or token is invalid.'},
+                status=status.HTTP_401_UNAUTHORIZED
+            ) 
         JWTTokenManager.delete_user_refresh_tokens(request.user.id)
         if access_token:
             JWTTokenManager.blacklist_token(access_token)
@@ -57,6 +53,3 @@ class LogoutView(BaseUserView):
             'message': 'Successfully logged out.'
         })
 
-
-class TokensRefreshView(BaseUserView):
-    ...
