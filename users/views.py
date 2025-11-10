@@ -3,14 +3,9 @@ from rest_framework.mixins import CreateModelMixin, UpdateModelMixin, DestroyMod
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
-from django.contrib.auth import get_user_model
 
 from jwt_auth.managers import JWTTokenManager
 from users.serializers import UserProfileSerializer, UserRegisterSerializer
-
-
-class BaseUserView(GenericAPIView):
-    user_model = get_user_model()
 
 
 class UserRegisterView(GenericAPIView, CreateModelMixin):
@@ -51,8 +46,8 @@ class UserProfileView(GenericAPIView, UpdateModelMixin, DestroyModelMixin):
     def patch(self, request, *args, **kwargs):
         return self.partial_update(request, *args, **kwargs)
     
-    # def destroy(self, request, *args, **kwargs):
-    #     return self.destroy(request, *args, **kwargs)
+    def destroy(self, request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs)
 
     def get_object(self):
         return self.request.user
