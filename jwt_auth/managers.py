@@ -110,7 +110,7 @@ class JWTTokenManager:
                 return False
             
             return RefreshToken.objects.filter(
-                token=refresh_token,
+                jti=payload['jti'],
                 expires_at__gt=datetime.now(timezone.utc)
             ).exists()
         except jwt.PyJWTError:
