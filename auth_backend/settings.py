@@ -165,7 +165,8 @@ SPECTACULAR_SETTINGS = {
                 "scheme": "bearer",
                 "bearerFormat": "JWT",
             }
-        }
+        }   
     },
+    'SECURITY': [{'bearerAuth': []}],
 }
 
