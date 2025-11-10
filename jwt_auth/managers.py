@@ -7,7 +7,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractBaseUser
 from rest_framework.exceptions import AuthenticationFailed
 
-from jwt_auth.models import RefreshToken
+from jwt_auth.models import BlacklistedToken, RefreshToken
 from jwt_auth.token_data import TokenPair, TokenType
 
 
@@ -74,14 +74,15 @@ class JWTTokenManager:
             access_token=access_token,
             refresh_token=refresh_token
         )
-        
-    
+
     @classmethod
     def authenticate_by_access_token(cls, token: str) -> AbstractBaseUser:
         if not settings.TOKEN_SECRET_KEY or not settings.TOKEN_ALGORITHM:
             raise AuthenticationFailed('JWT config error')
         try:
             payload = cls._get_token_payload(token)
+            if cls.is_token_blacklisted(payload['jti']):
+                raise AuthenticationFailed('Token is blacklisted')
             if payload.get('type') != TokenType.ACCESS.value:
                 raise AuthenticationFailed('Invalid token type')
             user_id = payload.get('sub')
@@ -133,4 +134,27 @@ class JWTTokenManager:
     @classmethod
     def delete_user_refresh_tokens(cls, user_id: int) -> None:
         RefreshToken.objects.filter(user_id=user_id).delete()
+
+    @classmethod
+    def blacklist_token(cls, token: str) -> None:
+        try:
+            payload = cls._get_token_payload(token, verify_exp=False)
+            BlacklistedToken.objects.create(
+                jti=payload['jti'],
+                user_id=int(payload['sub']),
+                expires_at=datetime.fromtimestamp(
+                    payload['exp'],
+                    tz=timezone.utc
+                )
+            )
+        except jwt.PyJWTError:
+            pass  # игнорируем невалидный токен
+
+
+    @classmethod
+    def is_token_blacklisted(cls, jti: str) -> bool:
+        return BlacklistedToken.objects.filter(
+            jti=jti,
+            expires_at__gt=datetime.now(timezone.utc)
+        ).exists()
 

@@ -38,7 +38,24 @@ class LoginView(BaseUserView):
 
 
 class LogoutView(BaseUserView):
-    ...
+    def post(self, request):
+        auth_header = request.headers.get('Authorization', '')
+        access_token = None
+        
+        token_parts = auth_header.split(' ')
+        if len(token_parts) != 2 or token_parts[0].lower() != 'bearer':
+            return Response(
+                {'message': 'Invalid user token'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        access_token = auth_header.split(' ')[1]
+        
+        JWTTokenManager.delete_user_refresh_tokens(request.user.id)
+        if access_token:
+            JWTTokenManager.blacklist_token(access_token)
+        return Response({
+            'message': 'Successfully logged out.'
+        })
 
 
 class TokensRefreshView(BaseUserView):
