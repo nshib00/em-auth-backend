@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'drf_spectacular',
 
     # my apps
+    'auth_backend',
     'users.apps.UsersConfig',
     'jwt_auth.apps.JwtAuthConfig',
     'permissions.apps.PermissionsConfig',
