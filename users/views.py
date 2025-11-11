@@ -41,9 +41,6 @@ class UserProfileView(GenericAPIView, UpdateModelMixin, DestroyModelMixin):
         serializer = self.get_serializer(request.user)
         return Response(serializer.data)
 
-    def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
-
     def patch(self, request, *args, **kwargs):
         return self.partial_update(request, *args, **kwargs)
     
