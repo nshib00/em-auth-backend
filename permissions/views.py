@@ -1,20 +1,19 @@
 from rest_framework import viewsets, mixins
-from permissions.models import Permission, Action, ResourceType, Role
-from permissions.serializers import (
-    PermissionSerializer,
-    ActionSerializer,
-    ResourceTypeSerializer,
-    RoleSerializer
-)
+from permissions.models import Permission
+from permissions.serializers import PermissionSerializer
 from permissions.classes import IsAdmin
 from rest_framework.response import Response
 
 
-class BasePermissionViewSet(
+class PermissionViewSet(
         mixins.ListModelMixin,
+        mixins.RetrieveModelMixin,
+        mixins.CreateModelMixin,
         viewsets.GenericViewSet
     ):
     permission_classes = [IsAdmin]
+    queryset = Permission.objects.all()
+    serializer_class = PermissionSerializer
 
     def partial_update(self, request, *args, **kwargs):
         kwargs['partial'] = True
@@ -23,23 +22,3 @@ class BasePermissionViewSet(
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
-
-
-class PermissionViewSet(BasePermissionViewSet):
-    queryset = Permission.objects.all()
-    serializer_class = PermissionSerializer
-
-
-class ActionViewSet(BasePermissionViewSet):
-    queryset = Action.objects.all()
-    serializer_class = ActionSerializer
-
-
-class ResourceTypeViewSet(BasePermissionViewSet):
-    queryset = ResourceType.objects.all()
-    serializer_class = ResourceTypeSerializer
-
-
-class RoleViewSet(BasePermissionViewSet):
-    queryset = Role.objects.all()
-    serializer_class = RoleSerializer
