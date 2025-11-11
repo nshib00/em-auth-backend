@@ -1,6 +1,5 @@
 from rest_framework.permissions import BasePermission
 from permissions.managers import PermissionManager
-from users.models.roles import Role
 
 
 class ResourceActionPermission(BasePermission):

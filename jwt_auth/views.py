@@ -1,5 +1,6 @@
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 from auth_backend.views import BaseUserView
 from jwt_auth.managers import JWTTokenManager
 from jwt_auth.serializers import LoginSerializer
@@ -33,12 +34,14 @@ class LoginView(BaseUserView):
                 )   
         except self.user_model.DoesNotExist:
             return Response(
-                {'error': 'Invalid credentials'},
-                status=status.HTTP_401_UNAUTHORIZED
+                {'error': 'User with given email and password not found'},
+                status=status.HTTP_404_NOT_FOUND
             )
 
 
 class LogoutView(BaseUserView):
+    permission_classes = [IsAuthenticated]
+
     def post(self, request):
         access_token = get_access_token_from_request(request)
         if access_token is None:

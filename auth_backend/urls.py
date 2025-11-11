@@ -6,6 +6,7 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 api_urls = [
     path('users/', include('users.urls')),
     path('auth/', include('jwt_auth.urls')),
+    path('permissions/', include('permissions.urls')),
     # path('objects/', include('mock_objects.urls')),
 
     path('schema/', SpectacularAPIView.as_view(), name='schema'),
