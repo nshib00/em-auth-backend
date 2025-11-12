@@ -14,6 +14,7 @@ class PermissionManager:
         Проверяет, есть ли у пользователя хотя бы одна роль
         с разрешением (resource_type, action).
         '''
+        print(f'{self.roles=}, {resource_type=}, {action=}')
         if not self.roles:
             return False
         return Permission.objects.filter(

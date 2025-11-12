@@ -13,7 +13,7 @@ class ResourceActionPermission(BasePermission):
         # если resource_type и action переданы во view как атрибуты класса,
         # то они подтягиваются автоматически 
         resource_type = getattr(view, 'resource_type', None)
-        action = getattr(view, 'action', None)
+        action = getattr(view, 'resource_action', None)
 
         if resource_type is None or action is None:
             return False

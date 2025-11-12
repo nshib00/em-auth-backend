@@ -64,26 +64,35 @@ class Command(BaseCommand):
 
     def create_permissions(self):
         '''
-        Создает тестовые права доступа для каждой роли:
-        - admin: полный доступ (view, create, change, delete)
-        - manager: просмотр и изменение
-        - user: только просмотр
+        Создание разных прав доступа для orders и products:
+        - admin: полный доступ к обоим
+        - manager: orders (view, change), products (view)
+        - user: orders (view), products (нет доступа)
         '''
-
-        roles = {
-            self.admin_role: [self.action_view, self.action_create, self.action_change, self.action_delete],
-            self.manager_role: [self.action_view, self.action_change],
-            self.user_role: [self.action_view],
+        roles_to_actions = {
+            self.admin_role: {
+                self.res_orders: [self.action_view, self.action_create, self.action_change, self.action_delete],
+                self.res_products: [self.action_view, self.action_create, self.action_change, self.action_delete],
+            },
+            self.manager_role: {
+                self.res_orders: [self.action_view, self.action_change],
+                self.res_products: [self.action_view],
+            },
+            self.user_role: {
+                self.res_orders: [self.action_view],
+                self.res_products: [],
+            },
         }
-        resources = [self.res_orders, self.res_products]
-        for role, actions in roles.items():
-            for resource in resources:
+
+        for role, resources in roles_to_actions.items():
+            for resource, actions in resources.items():
                 for action in actions:
                     Permission.objects.get_or_create(
                         role=role,
                         resource_type=resource,
                         action=action,
                     )
+
         self.stdout.write('Permissions created.')
 
     def create_users(self):
